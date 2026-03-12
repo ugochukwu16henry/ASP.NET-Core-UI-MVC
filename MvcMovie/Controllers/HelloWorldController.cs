@@ -13,8 +13,8 @@ public class HelloWorldController : Controller
     }
     // 
     // GET: /HelloWorld/Welcome/ 
-    public string Welcome()
+    public string Welcome(string name, int id = 1)
     {
-        return "This is the Welcome action method...";
+        return HtmlEncoder.Default.Encode($"Hello {name}, ID: {id}");
     }
 }
