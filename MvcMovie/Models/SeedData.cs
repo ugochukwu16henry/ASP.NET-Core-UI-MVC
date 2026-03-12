@@ -10,12 +10,32 @@ public static class SeedData
         using var context = new MvcMovieContext(
             serviceProvider.GetRequiredService<DbContextOptions<MvcMovieContext>>());
 
-        if (context.Movie.Any())
+        var favoriteMovies = new List<Movie>
         {
-            return;
-        }
-
-        context.Movie.AddRange(
+            new Movie
+            {
+                Title = "Iron Man 3",
+                ReleaseDate = DateTime.Parse("2013-05-03"),
+                Genre = "Action",
+                Rating = "PG-13",
+                Price = 12.99M
+            },
+            new Movie
+            {
+                Title = "Avengers: Endgame",
+                ReleaseDate = DateTime.Parse("2019-04-26"),
+                Genre = "Action",
+                Rating = "PG-13",
+                Price = 14.99M
+            },
+            new Movie
+            {
+                Title = "Spider-Man: No Way Home",
+                ReleaseDate = DateTime.Parse("2021-12-17"),
+                Genre = "Action",
+                Rating = "PG-13",
+                Price = 13.99M
+            },
             new Movie
             {
                 Title = "When Harry Met Sally",
@@ -26,7 +46,7 @@ public static class SeedData
             },
             new Movie
             {
-                Title = "Ghostbusters ",
+                Title = "Ghostbusters",
                 ReleaseDate = DateTime.Parse("1984-3-13"),
                 Genre = "Comedy",
                 Rating = "PG",
@@ -35,21 +55,26 @@ public static class SeedData
             new Movie
             {
                 Title = "Ghostbusters 2",
-                ReleaseDate = DateTime.Parse("1986-2-23"),
+                ReleaseDate = DateTime.Parse("1989-06-16"),
                 Genre = "Comedy",
                 Rating = "PG",
                 Price = 9.99M
-            },
-            new Movie
-            {
-                Title = "Rio Bravo",
-                ReleaseDate = DateTime.Parse("1959-4-15"),
-                Genre = "Western",
-                Rating = "NR",
-                Price = 3.99M
             }
-        );
+        };
 
-        context.SaveChanges();
+        var existingTitles = context.Movie
+            .Select(m => m.Title)
+            .Where(t => t != null)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var moviesToAdd = favoriteMovies
+            .Where(movie => movie.Title != null && !existingTitles.Contains(movie.Title))
+            .ToList();
+
+        if (moviesToAdd.Count > 0)
+        {
+            context.Movie.AddRange(moviesToAdd);
+            context.SaveChanges();
+        }
     }
 }
